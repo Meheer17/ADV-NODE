@@ -119,7 +119,7 @@ function ensureAuthenticated(req, res, next) {
         return next();
     }
     res.redirect('/');
-}
+};
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
