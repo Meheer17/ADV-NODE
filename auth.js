@@ -36,7 +36,7 @@ passport.use(new GitHubStrategy({
     },
     (accessToken, refreshToken, profile, cb) => {
       console.log(profile);
-      myDataBase.findAndModify(
+      adn.findAndModify(
         { id: profile.id },
         {},
         {
