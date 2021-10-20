@@ -14,7 +14,7 @@ const io = require('socket.io')(http);
 const passportSocketIo = require('passport.socketio');
 const cookieParser = require('cookie-parser');
 const MongoStore = require('connect-mongo')(session);
-const URI = process.env.MONGO_URI;
+const URI = process.env.URI;
 const store = new MongoStore({ url: URI });
 
 app.set('view engine', 'pug');
@@ -48,21 +48,31 @@ io.use(
 );
 
 myDB(async (client) => {
-  const myDataBase = await client.db('database').collection('users');
+  const adn = await client.db('database').collection('users');
 
-  routes(app, myDataBase);
-  auth(app, myDataBase);
+  routes(app, adn);
+  auth(app, adn);
 
   let currentUsers = 0;
   io.on('connection', (socket) => {
     ++currentUsers;
-    io.emit('user count', currentUsers);
-    console.log('user ' + socket.request.user.username + ' connected');
-
+    io.emit('user', {
+      name: socket.request.user.name,
+      currentUsers,
+      connected: true
+    });
+    socket.on('chat message', (message) => {
+      io.emit('chat message', { name: socket.request.user.name, message });
+    });
+    console.log('A user has connected');
     socket.on('disconnect', () => {
       console.log('A user has disconnected');
       --currentUsers;
-      io.emit('user count', currentUsers);
+      io.emit('user', {
+        name: socket.request.user.name,
+        currentUsers,
+        connected: false
+      });
     });
   });
 }).catch((e) => {
