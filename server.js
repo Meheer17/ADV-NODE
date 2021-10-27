@@ -1,4 +1,4 @@
-'use strict';
+    'use strict';
 require('dotenv').config();
 const express = require('express');
 const myDB = require('./connection');
@@ -14,8 +14,8 @@ const io = require('socket.io')(http);
 const passportSocketIo = require('passport.socketio');
 const cookieParser = require('cookie-parser');
 const MongoStore = require('connect-mongo')(session);
-const URI = process.env.URI;
-const store = new MongoStore({ url: URI });
+const URI = process.env.MONGO_URI;
+// const store = new MongoStore({ url: URI });
 
 app.set('view engine', 'pug');
 
@@ -28,9 +28,9 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: true,
   saveUninitialized: true,
+//   store: store,
   cookie: { secure: false },
-  key: 'express.sid',
-  store: store
+  key: 'express.sid'
 }));
 
 app.use(passport.initialize());
@@ -40,8 +40,8 @@ io.use(
   passportSocketIo.authorize({
     cookieParser: cookieParser,
     key: 'express.sid',
+    // store: store,
     secret: process.env.SESSION_SECRET,
-    store: store,
     success: onAuthorizeSuccess,
     fail: onAuthorizeFail
   })
